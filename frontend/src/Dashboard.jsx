@@ -121,6 +121,7 @@ const Dashboard = () => {
           timestamp: new Date(reading.server_timestamp).toLocaleTimeString(),
           moisture: reading.moisture,
           temp: reading.temp,
+          humidity: reading.humidity,
           pressure: reading.pressure,
           vibration_anomaly: reading.vibration_anomaly_score || 0,
           health_score: reading.machine_health_score,
@@ -348,6 +349,36 @@ const Dashboard = () => {
               <YAxis domain={[0, 100]} tickLine={false} axisLine={{ stroke: '#E3D8C3' }} />
               <Tooltip />
               <Line type="monotone" dataKey="health_score" stroke="#4B7B4A" strokeWidth={2} dot={false} isAnimationActive={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="charts-row">
+        {/* Humidity Chart */}
+        <div className="chart-container">
+          <h3>Humidity Over Time</h3>
+          <ResponsiveContainer width="100%" height={230}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="timestamp" tickLine={false} axisLine={{ stroke: '#E3D8C3' }} />
+              <YAxis domain={[0, 100]} tickLine={false} axisLine={{ stroke: '#E3D8C3' }} />
+              <Tooltip />
+              <Line type="monotone" dataKey="humidity" stroke="#D4A574" strokeWidth={2} dot={false} isAnimationActive={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Storm Risk Over Time */}
+        <div className="chart-container">
+          <h3>Storm Risk Trend</h3>
+          <ResponsiveContainer width="100%" height={230}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="timestamp" tickLine={false} axisLine={{ stroke: '#E3D8C3' }} />
+              <YAxis domain={[0, 100]} tickLine={false} axisLine={{ stroke: '#E3D8C3' }} />
+              <Tooltip />
+              <Line type="monotone" dataKey="storm_risk" stroke="#B08228" strokeWidth={2} dot={false} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
