@@ -42,7 +42,24 @@ class Analytics:
     
     # Storm Risk
     STORM_RISK_THRESHOLD = 30        # % - above this triggers storm warning
-    
+
+    # ==================== Raw Sensor Calibration ====================
+    # The Arduino sends raw analogRead() values (0-1023) for moisture
+    # and water level rather than pre-converted percentages/booleans,
+    # so this backend normalizes them before anything else runs.
+    #
+    # Moisture: higher raw value = drier soil (resistive sensor)
+    MOISTURE_RAW_DRY = 700    # TODO: Calibrate against your actual sensor
+    MOISTURE_RAW_WET = 400    # TODO: Calibrate against your actual sensor
+
+    # Water level: higher raw value = more water present (confirmed
+    # against this unit's hardware - dry reads ~20, rises when wet)
+    WATER_LEVEL_RAW_THRESHOLD = 500 # TODO: Calibrate - above this = water detected
+
+    # Rain sensor on this unit is non-functional hardware - ignored
+    # entirely rather than fed garbage readings into storm risk.
+    RAIN_SENSOR_ENABLED = False
+
     def __init__(self):
         """Initialize analytics engine"""
         self.vibration_history = deque(maxlen=self.VIBRATION_WINDOW_SIZE)
@@ -53,24 +70,42 @@ class Analytics:
         self.last_alert_time = {}  # Track alert cooldowns
         self.alert_cooldown_seconds = 30
     
+    def _normalize_raw_value(self, raw: float, raw_at_0: float, raw_at_100: float) -> float:
+        """Map a raw analogRead() value onto a 0-100 scale, clamped."""
+        if raw_at_0 == raw_at_100:
+            return 0.0
+        pct = (raw - raw_at_0) / (raw_at_100 - raw_at_0) * 100.0
+        return max(0.0, min(100.0, pct))
+
     def process_reading(self, reading: Dict) -> Dict:
         """
         Process sensor reading and compute analytics
-        
+
         Args:
-            reading: Raw sensor data from Arduino
-        
+            reading: Raw sensor data from Arduino (moisture/rain/waterLevel
+                     are raw analogRead() values, 0-1023 - not yet converted)
+
         Returns:
-            Enriched reading with computed values
+            Enriched reading with computed values. moisture/rain/waterLevel
+            in the returned dict are normalized (moisture as %, rain/
+            waterLevel as 0/1 booleans) - the raw ints are not passed through.
         """
         enriched = reading.copy()
-        
-        # Extract sensor values
-        moisture = reading.get('moisture', 0)
+
+        # Normalize raw sensor values before anything else touches them
+        raw_moisture = reading.get('moisture', 0)
+        raw_water = reading.get('waterLevel', 0)
+
+        moisture = self._normalize_raw_value(raw_moisture, self.MOISTURE_RAW_DRY, self.MOISTURE_RAW_WET)
+        rain = 0 if not self.RAIN_SENSOR_ENABLED else (1 if reading.get('rain', 0) > 0 else 0)
+        water_level = 1 if raw_water > self.WATER_LEVEL_RAW_THRESHOLD else 0
+
+        enriched['moisture'] = round(moisture, 1)
+        enriched['rain'] = rain
+        enriched['waterLevel'] = water_level
+
         pressure = reading.get('pressure', 0)
         vibration = reading.get('vibration', 0)
-        rain = reading.get('rain', 0)
-        water_level = reading.get('waterLevel', 0)
         
         # Update histories
         self.vibration_history.append(vibration)

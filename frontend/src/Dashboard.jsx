@@ -123,7 +123,7 @@ const Dashboard = () => {
           temp: reading.temp,
           humidity: reading.humidity,
           pressure: reading.pressure,
-          vibration_anomaly: reading.vibration_anomaly_score || 0,
+          vibration: reading.vibration || 0,
           health_score: reading.machine_health_score,
           storm_risk: reading.storm_risk,
         })
@@ -302,18 +302,25 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Vibration Anomaly Chart */}
+        {/* Vibration Chart */}
         <div className="chart-container">
-          <h3>Vibration Anomaly Score</h3>
+          <h3>Vibration Detected</h3>
           <ResponsiveContainer width="100%" height={230}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="timestamp" tickLine={false} axisLine={{ stroke: '#E3D8C3' }} />
-              <YAxis domain={[0, 100]} tickLine={false} axisLine={{ stroke: '#E3D8C3' }} />
-              <Tooltip />
+              <YAxis
+                domain={[0, 1]}
+                ticks={[0, 1]}
+                tickFormatter={(v) => (v ? 'Detected' : 'None')}
+                tickLine={false}
+                axisLine={{ stroke: '#E3D8C3' }}
+                width={70}
+              />
+              <Tooltip formatter={(v) => (v ? 'Detected' : 'None')} />
               <Line
-                type="monotone"
-                dataKey="vibration_anomaly"
+                type="stepAfter"
+                dataKey="vibration"
                 stroke="#B5502E"
                 strokeWidth={2}
                 dot={false}
