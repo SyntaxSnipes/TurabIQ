@@ -87,14 +87,18 @@ class SerialReader:
                                 if reading:
                                     # Add server timestamp
                                     reading['server_timestamp'] = datetime.utcnow().isoformat()
-                                    
+
+                                    # Let the callback enrich the reading (e.g. analytics)
+                                    # before it's stored, so /latest and /history serve
+                                    # the same enriched shape that gets broadcast live
+                                    if on_new_reading:
+                                        result = await on_new_reading(reading)
+                                        if result is not None:
+                                            reading = result
+
                                     # Store in buffer
                                     with self.buffer_lock:
                                         buffer.append(reading)
-                                    
-                                    # Call callback if provided
-                                    if on_new_reading:
-                                        await on_new_reading(reading)
                             
                             line_buffer = ""
                         else:

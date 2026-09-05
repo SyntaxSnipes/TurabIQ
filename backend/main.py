@@ -60,13 +60,16 @@ async def shutdown_event():
         serial_reader.close()
     print("TurabIQ Backend shutdown complete")
 
-async def on_new_reading(reading: dict):
+async def on_new_reading(reading: dict) -> dict:
     """Callback when new sensor reading arrives"""
     # Process reading through analytics
     enriched_reading = analytics.process_reading(reading)
-    
+
     # Broadcast to all connected WebSocket clients
     await broadcast_to_clients(enriched_reading)
+
+    # Returned value is what gets stored in sensor_readings (used by /latest, /history)
+    return enriched_reading
 
 async def broadcast_to_clients(data: dict):
     """Send data to all connected WebSocket clients"""
