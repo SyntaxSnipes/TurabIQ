@@ -60,14 +60,23 @@ class Analytics:
     # entirely rather than fed garbage readings into storm risk.
     RAIN_SENSOR_ENABLED = False
 
+    # Vibration debounce: the digital vibration pin can flicker between
+    # 0/1 on electrical noise when the sensor module's output floats at
+    # rest. Require this many consecutive raw readings agreeing before
+    # trusting a state change, rather than reacting to a single sample.
+    VIBRATION_DEBOUNCE_COUNT = 2
+
     def __init__(self):
         """Initialize analytics engine"""
         self.vibration_history = deque(maxlen=self.VIBRATION_WINDOW_SIZE)
         self.rate_history = deque(maxlen=self.VIBRATION_RATE_WINDOW)  # Track vibration event rate over time
         self.pressure_history = deque(maxlen=self.PRESSURE_WINDOW_SIZE)
         self.moisture_history = deque(maxlen=self.VIBRATION_WINDOW_SIZE)
-        
+
         self.last_alert_time = {}  # Track alert cooldowns
+        self.debounced_vibration = 0
+        self.pending_vibration = 0
+        self.pending_vibration_count = 0
         self.alert_cooldown_seconds = 30
     
     def _normalize_raw_value(self, raw: float, raw_at_0: float, raw_at_100: float) -> float:
@@ -76,6 +85,32 @@ class Analytics:
             return 0.0
         pct = (raw - raw_at_0) / (raw_at_100 - raw_at_0) * 100.0
         return max(0.0, min(100.0, pct))
+
+    def _debounce_vibration(self, raw_vibration: int) -> int:
+        """
+        Only accept a vibration state change once it's been consistent
+        for VIBRATION_DEBOUNCE_COUNT consecutive readings, so single-sample
+        electrical noise on a floating pin doesn't register as a real event.
+        """
+        raw_vibration = 1 if raw_vibration else 0
+
+        if raw_vibration == self.debounced_vibration:
+            # Already-confirmed state repeating - reset any pending flip
+            self.pending_vibration = raw_vibration
+            self.pending_vibration_count = 0
+            return self.debounced_vibration
+
+        if raw_vibration == self.pending_vibration:
+            self.pending_vibration_count += 1
+        else:
+            self.pending_vibration = raw_vibration
+            self.pending_vibration_count = 1
+
+        if self.pending_vibration_count >= self.VIBRATION_DEBOUNCE_COUNT:
+            self.debounced_vibration = raw_vibration
+            self.pending_vibration_count = 0
+
+        return self.debounced_vibration
 
     def process_reading(self, reading: Dict) -> Dict:
         """
@@ -105,8 +140,9 @@ class Analytics:
         enriched['waterLevel'] = water_level
 
         pressure = reading.get('pressure', 0)
-        vibration = reading.get('vibration', 0)
-        
+        vibration = self._debounce_vibration(reading.get('vibration', 0))
+        enriched['vibration'] = vibration
+
         # Update histories
         self.vibration_history.append(vibration)
         self.pressure_history.append(pressure)
