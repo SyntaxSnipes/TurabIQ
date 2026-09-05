@@ -111,8 +111,8 @@ async def health():
 async def get_latest():
     """Get the latest sensor reading"""
     if not sensor_readings:
-        return {"error": "No readings available yet"}, 404
-    
+        return JSONResponse(status_code=404, content={"error": "No readings available yet"})
+
     return sensor_readings[-1]
 
 @app.get("/history")
@@ -140,7 +140,7 @@ async def control_servo(angle: int):
         serial_reader.send_command(command)
         return {"status": "ok", "action": "SERVO", "angle": angle}
     except Exception as e:
-        return {"error": str(e)}, 500
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 @app.post("/control/motor")
 async def control_motor(speed: int):
@@ -152,7 +152,7 @@ async def control_motor(speed: int):
         serial_reader.send_command(command)
         return {"status": "ok", "action": "MOTOR", "speed": speed}
     except Exception as e:
-        return {"error": str(e)}, 500
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 @app.post("/control/buzzer")
 async def control_buzzer(state: bool):
@@ -163,7 +163,7 @@ async def control_buzzer(state: bool):
         serial_reader.send_command(command)
         return {"status": "ok", "action": "BUZZER", "state": state}
     except Exception as e:
-        return {"error": str(e)}, 500
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 @app.post("/control/stop")
 async def emergency_stop():
@@ -172,7 +172,7 @@ async def emergency_stop():
         serial_reader.send_command("STOP\n")
         return {"status": "ok", "action": "STOP"}
     except Exception as e:
-        return {"error": str(e)}, 500
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 # ==================== WebSocket Endpoint ====================
 

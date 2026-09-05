@@ -32,8 +32,8 @@ const Dashboard = () => {
   })
   const lastAlertTypeRef = useRef(null)
 
-  // Configuration - TODO: Update with your backend's IP (the machine running main.py)
-  const BACKEND_URL = "http://localhost:8000"
+  // Configuration - backend runs on the machine physically connected to the Arduino
+  const BACKEND_URL = "http://10.3.148.218:8000"
   const POLL_INTERVAL_MS = 1000
   const HISTORY_LIMIT = 60 // Keep last 60 seconds in chart
 
