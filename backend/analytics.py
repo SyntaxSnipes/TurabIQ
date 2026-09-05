@@ -53,8 +53,12 @@ class Analytics:
     MOISTURE_RAW_WET = 400    # TODO: Calibrate against your actual sensor
 
     # Water level: higher raw value = more water present (confirmed
-    # against this unit's hardware - dry reads ~20, rises when wet)
-    WATER_LEVEL_RAW_THRESHOLD = 500 # TODO: Calibrate - above this = water detected
+    # against this unit's hardware - dry reads ~20, rises when wet).
+    # Storm risk scales smoothly between these two bounds rather than
+    # tripping at a single threshold.
+    WATER_LEVEL_RAW_DRY = 50    # TODO: Calibrate - baseline reading with no water
+    WATER_LEVEL_RAW_FULL = 800  # TODO: Calibrate - reading fully submerged/saturated
+    WATER_LEVEL_RAW_THRESHOLD = 500 # above this = waterLevel boolean reports detected
 
     # Rain sensor on this unit is non-functional hardware - ignored
     # entirely rather than fed garbage readings into storm risk.
@@ -134,6 +138,7 @@ class Analytics:
         moisture = self._normalize_raw_value(raw_moisture, self.MOISTURE_RAW_DRY, self.MOISTURE_RAW_WET)
         rain = 0 if not self.RAIN_SENSOR_ENABLED else (1 if reading.get('rain', 0) > 0 else 0)
         water_level = 1 if raw_water > self.WATER_LEVEL_RAW_THRESHOLD else 0
+        water_level_pct = self._normalize_raw_value(raw_water, self.WATER_LEVEL_RAW_DRY, self.WATER_LEVEL_RAW_FULL)
 
         enriched['moisture'] = round(moisture, 1)
         enriched['rain'] = rain
@@ -156,7 +161,7 @@ class Analytics:
             enriched['pressure_trend'],
             moisture
         )
-        enriched['storm_risk'] = self._compute_storm_risk(rain, water_level)
+        enriched['storm_risk'] = self._compute_storm_risk(rain, water_level_pct)
         
         # Generate alerts
         enriched['alerts'] = self._check_alerts(
@@ -255,21 +260,19 @@ class Analytics:
         
         return round(max(0, min(100, health_score)), 2)
     
-    def _compute_storm_risk(self, rain: int, water_level: int) -> float:
+    def _compute_storm_risk(self, rain: int, water_level_pct: float) -> float:
         """
         Compute storm risk index (0-100)
-        Combines rain detection and water level
+        Water level contributes smoothly (0-70) based on how far above its
+        dry baseline the raw reading sits; rain is a flat +30 when detected
+        (currently always 0 - rain sensor on this unit is disabled).
         """
-        # Base risk from sensors
-        risk = 0.0
-        
+        risk = water_level_pct * 0.7
+
         if rain:
-            risk += 50
-        
-        if water_level:
-            risk += 50
-        
-        return min(100, risk)
+            risk += 30
+
+        return round(min(100, risk), 1)
     
     def _check_alerts(self, health_score: float, storm_risk: float, vibration_anomaly: float) -> List[Dict]:
         """
