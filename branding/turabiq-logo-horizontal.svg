@@ -1,0 +1,45 @@
+<svg viewBox="0 0 320 100" xmlns="http://www.w3.org/2000/svg" width="320" height="100">
+  <!-- TurabIQ Horizontal Logo (Mark + Wordmark)
+       Modern industrial aesthetic with geometric sans-serif
+  -->
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+      .wordmark { font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -0.5px; }
+      .tagline { font-family: 'Space Grotesk', sans-serif; font-weight: 400; font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; }
+      .arabic { font-family: 'Segoe UI', 'Arabic Typesetting', sans-serif; font-size: 12px; font-weight: 500; }
+    </style>
+  </defs>
+  
+  <!-- Logo Mark (left) -->
+  <g transform="translate(15, 20)">
+    <!-- Stratified layers -->
+    <path d="M 10 50 Q 20 46 30 50 Q 40 54 50 50 L 50 57 Q 40 61 30 57 Q 20 53 10 57 Z" 
+          fill="#D4A574" opacity="0.95"/>
+    <path d="M 8 36 Q 18 31 30 35 Q 42 39 52 33 L 52 42 Q 42 48 30 45 Q 18 42 8 47 Z" 
+          fill="#C29A6B" opacity="0.85"/>
+    <path d="M 10 20 Q 20 15 30 18 Q 40 21 50 16 L 50 25 Q 40 30 30 27 Q 20 24 10 29 Z" 
+          fill="#A0826D" opacity="0.75"/>
+    
+    <!-- Signal line -->
+    <g stroke="#1B7B7F" stroke-width="1.8" fill="none" stroke-linecap="round">
+      <path d="M 30 58 L 29 53 L 30 48 L 31 43 L 30 38 L 29 33 L 30 28 L 31 23 L 30 18"/>
+    </g>
+    
+    <!-- Top accent -->
+    <line x1="10" y1="15" x2="50" y2="15" stroke="#1B7B7F" stroke-width="1" opacity="0.4"/>
+  </g>
+  
+  <!-- Divider line -->
+  <line x1="80" y1="30" x2="80" y2="70" stroke="#D4A574" stroke-width="1.5" opacity="0.5"/>
+  
+  <!-- Wordmark (right) -->
+  <text x="95" y="58" class="wordmark" fill="#2C2C2C">TurabIQ</text>
+  
+  <!-- Optional: Arabic text below wordmark -->
+  <text x="95" y="78" class="arabic" fill="#1B7B7F">تراب</text>
+  
+  <!-- Optional: Tagline -->
+  <text x="95" y="90" class="tagline" fill="#A0826D" opacity="0.7">Soil Intelligence</text>
+</svg>

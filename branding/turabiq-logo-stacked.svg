@@ -1,0 +1,41 @@
+<svg viewBox="0 0 140 160" xmlns="http://www.w3.org/2000/svg" width="140" height="160">
+  <!-- TurabIQ Stacked Logo (Mark + Wordmark vertical)
+       For smaller spaces, app icons, social media
+  -->
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+      .wordmark { font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -0.3px; }
+      .arabic { font-family: 'Segoe UI', 'Arabic Typesetting', sans-serif; font-size: 11px; font-weight: 500; }
+    </style>
+  </defs>
+  
+  <!-- Logo Mark (top, centered) -->
+  <g transform="translate(30, 15)">
+    <!-- Stratified layers -->
+    <path d="M 12 58 Q 22 53 35 58 Q 48 63 60 58 L 60 67 Q 48 72 35 67 Q 22 62 12 67 Z" 
+          fill="#D4A574" opacity="0.95"/>
+    <path d="M 10 40 Q 20 34 35 39 Q 50 44 62 37 L 62 49 Q 50 55 35 50 Q 20 45 10 52 Z" 
+          fill="#C29A6B" opacity="0.85"/>
+    <path d="M 12 20 Q 22 14 35 18 Q 48 22 60 16 L 60 27 Q 48 32 35 28 Q 22 24 12 31 Z" 
+          fill="#A0826D" opacity="0.75"/>
+    
+    <!-- Signal line -->
+    <g stroke="#1B7B7F" stroke-width="2" fill="none" stroke-linecap="round">
+      <path d="M 35 66 L 33 60 L 35 54 L 37 48 L 35 42 L 33 36 L 35 30 L 37 24 L 35 18"/>
+    </g>
+    
+    <!-- Top accent -->
+    <line x1="10" y1="14" x2="60" y2="14" stroke="#1B7B7F" stroke-width="1.2" opacity="0.4"/>
+  </g>
+  
+  <!-- Divider -->
+  <line x1="20" y1="95" x2="120" y2="95" stroke="#D4A574" stroke-width="1" opacity="0.4"/>
+  
+  <!-- Wordmark (bottom, centered) -->
+  <text x="70" y="132" class="wordmark" fill="#2C2C2C" text-anchor="middle">TurabIQ</text>
+  
+  <!-- Arabic text (centered) -->
+  <text x="70" y="150" class="arabic" fill="#1B7B7F" text-anchor="middle">تراب</text>
+</svg>

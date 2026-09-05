@@ -1,0 +1,36 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+  <!-- TurabIQ Logo Mark: Stratified Soil Layers + Sensor Signal
+       Concept: Three angled soil strata intersected by ascending signal waveform
+       Colors: Warm sand/clay + deep teal accent
+  -->
+  
+  <!-- Background circle (optional, can be removed) -->
+  <circle cx="60" cy="60" r="58" fill="none" stroke="#E8DCC8" stroke-width="1" opacity="0.3"/>
+  
+  <!-- Stratified Earth Layers (warm beige/clay tones) -->
+  <!-- Layer 1 (bottom) - Warm sand -->
+  <path d="M 30 85 Q 45 80 60 85 Q 75 90 90 85 L 90 95 Q 75 100 60 95 Q 45 90 30 95 Z" 
+        fill="#D4A574" opacity="0.95"/>
+  
+  <!-- Layer 2 (middle) - Slightly darker clay -->
+  <path d="M 25 65 Q 40 58 60 62 Q 80 66 95 60 L 95 72 Q 80 78 60 75 Q 40 72 25 78 Z" 
+        fill="#C29A6B" opacity="0.85"/>
+  
+  <!-- Layer 3 (upper) - Deep earth tone -->
+  <path d="M 28 42 Q 42 35 60 38 Q 78 41 92 36 L 92 50 Q 78 55 60 52 Q 42 49 28 54 Z" 
+        fill="#A0826D" opacity="0.75"/>
+  
+  <!-- Ascending Sensor Signal (deep teal) -->
+  <!-- Waveform representing data flow upward through soil strata -->
+  <g stroke="#1B7B7F" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Signal line ascending through layers -->
+    <path d="M 60 98 L 58 92 L 60 86 L 62 80 L 60 74 L 58 68 L 60 62 L 62 56 L 60 50"/>
+  </g>
+  
+  <!-- Small sensor dots at key points (optional accent) -->
+  <circle cx="60" cy="98" r="1.8" fill="#1B7B7F" opacity="0.6"/>
+  <circle cx="60" cy="50" r="2.2" fill="#1B7B7F" opacity="0.9"/>
+  
+  <!-- Top accent line (represents surface/interface) -->
+  <line x1="30" y1="35" x2="90" y2="35" stroke="#1B7B7F" stroke-width="1.5" opacity="0.4"/>
+</svg>

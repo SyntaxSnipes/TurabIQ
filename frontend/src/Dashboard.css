@@ -1,0 +1,492 @@
+/* TurabIQ Dashboard — Warm Industrial Console */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Naskh+Arabic:wght@500;600&display=swap');
+
+:root {
+  /* Brand */
+  --accent: #1B7B7F;           /* Deep Teal — live data / active state */
+  --accent-soft: #E1EDEC;
+  --sand: #D4A574;             /* Warm Sand */
+  --clay: #C29A6B;             /* Medium Clay */
+  --dark-clay: #A0826D;        /* Dark Clay */
+
+  /* Semantic (deliberately distinct from accent) */
+  --status-ok: #4B7B4A;
+  --status-ok-soft: #E7EEE3;
+  --status-warn: #B08228;
+  --status-warn-soft: #F4EAD4;
+  --status-critical: #B5502E;
+  --status-critical-soft: #F5E4DB;
+
+  /* Ground */
+  --ground: #F2ECE0;
+  --panel: #FFFFFF;
+  --panel-sunken: #FBF8F2;
+  --border: #E3D8C3;
+  --border-strong: #D4C4A4;
+
+  /* Text */
+  --ink: #2B2420;
+  --ink-soft: #6B5D4D;
+  --ink-faint: #9C8D78;
+
+  --radius: 4px;
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 14px;
+}
+
+.dashboard-container {
+  width: 100%;
+  min-height: 100vh;
+  max-width: 1440px;
+  margin: 0 auto;
+  background-color: var(--ground);
+  padding: 24px 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dashboard-container.loading {
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.dashboard-container.loading p {
+  color: var(--ink-soft);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Header ===== */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.brand-divider {
+  width: 1px;
+  height: 20px;
+  background-color: var(--border-strong);
+}
+
+.brand-arabic {
+  font-family: 'Noto Naskh Arabic', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  line-height: 1;
+}
+
+.brand-tag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding-left: 14px;
+  margin-left: 6px;
+  border-left: 1px solid var(--border-strong);
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background-color: var(--panel);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--status-critical);
+}
+
+.status-dot.connected {
+  background-color: var(--status-ok);
+  animation: pulse 2.4s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ===== Alert Banner ===== */
+.alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--status-warn);
+  background-color: var(--status-warn-soft);
+  color: #7A5E1D;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.alert-critical {
+  border-color: var(--status-critical);
+  background-color: var(--status-critical-soft);
+  color: #8A3B21;
+}
+
+.alert-icon {
+  font-size: 14px;
+}
+
+.alert-message {
+  flex: 1;
+  font-family: var(--font-mono);
+  letter-spacing: 0.01em;
+}
+
+.alert-close {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  padding: 2px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.alert-close:hover {
+  opacity: 1;
+}
+
+/* ===== Status strip: health + storm as compact inline gauges ===== */
+.status-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  gap: 1px;
+  background-color: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  min-height: min-content;
+  flex-shrink: 0;
+}
+
+.gauge-card {
+  background-color: var(--panel);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.gauge-label-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.gauge-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.gauge-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.gauge-value {
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.gauge-unit {
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.gauge-desc {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.gauge-bar-track {
+  flex: 1;
+  height: 6px;
+  background-color: var(--panel-sunken);
+  border-radius: 3px;
+  overflow: hidden;
+  min-width: 60px;
+}
+
+.gauge-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+/* Current conditions — instrument strip, not boxed tiles */
+.conditions-card {
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+}
+
+.condition-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 18px 20px;
+  border-left: 1px solid var(--border);
+}
+
+.condition-item:first-child {
+  border-left: none;
+}
+
+.condition-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.condition-value {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* ===== Charts ===== */
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+  gap: 20px;
+}
+
+.chart-container {
+  background-color: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 20px 12px;
+}
+
+.chart-container h3 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  color: var(--ink-soft);
+}
+
+/* ===== Control Panel ===== */
+.control-panel {
+  background-color: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.control-panel h3 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  color: var(--ink-soft);
+}
+
+.control-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.02em;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #156367;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* ===== Footer ===== */
+.dashboard-footer {
+  text-align: right;
+  padding-top: 4px;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+
+  .status-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .conditions-card {
+    flex-wrap: wrap;
+  }
+
+  .condition-item {
+    flex: 1 1 45%;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 16px 16px 28px;
+    gap: 14px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .dashboard-header h1 {
+    font-size: 19px;
+  }
+
+  .control-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .condition-item {
+    flex: 1 1 100%;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .condition-item:first-child {
+    border-top: none;
+  }
+}
+
+/* ===== Recharts theming ===== */
+.recharts-text {
+  fill: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: var(--ink-faint);
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--border);
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+
+.recharts-default-tooltip {
+  background-color: var(--panel) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+}

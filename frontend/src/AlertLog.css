@@ -1,0 +1,125 @@
+/* Alert Log — matches TurabIQ warm industrial console tokens (Dashboard.css) */
+
+.alert-log-panel {
+  background-color: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.alert-log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.alert-log-header h3 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.alert-log-clear {
+  background: none;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.alert-log-clear:hover:not(:disabled) {
+  background-color: var(--panel-sunken);
+  color: var(--ink);
+}
+
+.alert-log-clear:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.alert-log-list {
+  display: block;
+  max-height: 320px;
+  overflow-y: auto;
+  background-color: var(--border);
+  border-radius: var(--radius);
+}
+
+.alert-log-item + .alert-log-item {
+  border-top: 1px solid var(--border);
+}
+
+.alert-log-empty {
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  padding: 28px 16px;
+  text-align: center;
+  background-color: var(--ground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.alert-log-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background-color: var(--panel);
+}
+
+.alert-log-dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-top: 5px;
+  background-color: var(--status-warn);
+}
+
+.alert-log-critical .alert-log-dot {
+  background-color: var(--status-critical);
+}
+
+.alert-log-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.alert-log-message {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.alert-log-time {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  color: var(--ink-faint);
+}
+
+.alert-log-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.alert-log-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.alert-log-list::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong);
+  border-radius: 4px;
+}
