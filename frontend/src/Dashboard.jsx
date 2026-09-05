@@ -30,10 +30,11 @@ const Dashboard = () => {
       return []
     }
   })
-  const wsRef = useRef(null)
+  const lastAlertTypeRef = useRef(null)
 
-  // Configuration - TODO: Update with your backend URL
-  const BACKEND_URL = "ws://localhost:8000/ws"
+  // Configuration - TODO: Update with your backend's IP (the machine running main.py)
+  const BACKEND_URL = "http://localhost:8000"
+  const POLL_INTERVAL_MS = 1000
   const HISTORY_LIMIT = 60 // Keep last 60 seconds in chart
 
   useEffect(() => {
@@ -45,85 +46,63 @@ const Dashboard = () => {
   }, [alertHistory])
 
   useEffect(() => {
-    connectWebSocket()
+    let cancelled = false
+
+    const poll = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/latest`)
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        const data = await response.json()
+
+        if (cancelled || data.error) return
+
+        setConnected(true)
+        handleReading(data)
+      } catch (e) {
+        console.error("Error polling backend:", e)
+        if (!cancelled) setConnected(false)
+      }
+    }
+
+    poll()
+    const intervalId = setInterval(poll, POLL_INTERVAL_MS)
 
     return () => {
-      if (wsRef.current) {
-        wsRef.current.close()
-      }
+      cancelled = true
+      clearInterval(intervalId)
     }
   }, [])
 
-  const connectWebSocket = () => {
-    try {
-      wsRef.current = new WebSocket(BACKEND_URL)
+  const handleReading = (data) => {
+    setLatestReading(data)
+    updateChartData([data])
 
-      wsRef.current.onopen = () => {
-        console.log("✓ Connected to TurabIQ Backend")
-        setConnected(true)
-      }
-
-      wsRef.current.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data)
-
-          // Handle different message types
-          if (data.type === 'connection') {
-            console.log("Server:", data.message)
-          } else if (data.type === 'history') {
-            // Initial history load
-            updateChartData(data.data)
-          } else {
-            // Live sensor reading
-            setLatestReading(data)
-            updateChartData([data])
-
-            // Update alerts
-            if (data.alerts && data.alerts.length > 0) {
-              setAlerts(data.alerts)
-              // Auto-clear alerts after 10 seconds
-              setTimeout(() => {
-                if (data.alerts.some(a => a.type === alerts[0]?.type)) {
-                  setAlerts([])
-                }
-              }, 10000)
-
-              // Append new alerts to history, deduped against the most recent entry
-              setAlertHistory((prevHistory) => {
-                let updated = prevHistory
-                data.alerts.forEach((alert) => {
-                  const mostRecent = updated[0]
-                  const isDuplicate =
-                    mostRecent &&
-                    mostRecent.type === alert.type &&
-                    mostRecent.message === alert.message
-                  if (!isDuplicate) {
-                    updated = [alert, ...updated]
-                  }
-                })
-                return updated.slice(0, ALERT_HISTORY_LIMIT)
-              })
-            }
-          }
-        } catch (e) {
-          console.error("Error parsing message:", e)
+    // Update alerts
+    if (data.alerts && data.alerts.length > 0) {
+      setAlerts(data.alerts)
+      lastAlertTypeRef.current = data.alerts[0].type
+      // Auto-clear alerts after 10 seconds
+      setTimeout(() => {
+        if (lastAlertTypeRef.current === data.alerts[0].type) {
+          setAlerts([])
         }
-      }
+      }, 10000)
 
-      wsRef.current.onerror = (error) => {
-        console.error("WebSocket error:", error)
-        setConnected(false)
-      }
-
-      wsRef.current.onclose = () => {
-        console.log("✗ Disconnected from backend")
-        setConnected(false)
-        // Attempt reconnection after 3 seconds
-        setTimeout(connectWebSocket, 3000)
-      }
-    } catch (e) {
-      console.error("Failed to connect:", e)
-      setConnected(false)
+      // Append new alerts to history, deduped against the most recent entry
+      setAlertHistory((prevHistory) => {
+        let updated = prevHistory
+        data.alerts.forEach((alert) => {
+          const mostRecent = updated[0]
+          const isDuplicate =
+            mostRecent &&
+            mostRecent.type === alert.type &&
+            mostRecent.message === alert.message
+          if (!isDuplicate) {
+            updated = [alert, ...updated]
+          }
+        })
+        return updated.slice(0, ALERT_HISTORY_LIMIT)
+      })
     }
   }
 
@@ -160,7 +139,7 @@ const Dashboard = () => {
 
   const sendCommand = async (endpoint, data) => {
     try {
-      const response = await fetch(`http://localhost:8000${endpoint}`, {
+      const response = await fetch(`${BACKEND_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
